@@ -1,50 +1,33 @@
+name: Deploy Application
 
-name: Build & Deploy
 on:
   push:
     branches:
-      - main
-
+      - master
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-    - name: Node Setup
-      uses: actions/setup-node@v3
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
       with:
-        node-version: 18
-    
-    - name: Install Dependencies
-      run: npm install
+        node-version: '14'
 
-    - name: Build Files
-      run: npm run build
-         
-    - name: Copy Files via SSH
-      uses: appleboy/scp-action@v0.1.4
+    - name: Install SSH key
+      uses: webfactory/ssh-agent@v0.5.3
       with:
-        host: ${{ secrets.SSH_HOST }}
-        key: ${{ secrets.SSH_KEY }}
-        username: ${{ secrets.SSH_USERNAME }}
-        source: ./
-        target: ~/ReactJs-Application/
-        rm: true
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: SSH into the remote server and execute script
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        script: |
-            cd ~/ReactJs-Application
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-            nvm use 18
-            npm install pm2 -g
-            pm2 restart ReactJs-Application
+    - name: SSH into server
+      run: ssh -o StrictHostKeyChecking=no -i ./tensorlabs_azure.pem azureuser@40.90.163.170 'true'
+
+    - name: Pull latest code
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ./tensorlabs_azure.pem azureuser@40.90.163.170 << 'EOF'
+          git pull https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/<username>/<repo>.git
+        EOF
