@@ -1,4 +1,4 @@
-name: Deploy Application
+name: Deploy
 
 on:
   push:
@@ -10,24 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Install SSH key
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-    - name: SSH into server
-      run: ssh -o StrictHostKeyChecking=no -i ./tensorlabs_azure.pem azureuser@40.90.163.170 'true'
-
-    - name: Pull latest code
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ./tensorlabs_azure.pem azureuser@40.90.163.170 << 'EOF'
-          git pull https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/<username>/<repo>.git
-        EOF
+      - name: Deploy to server
+        env:
+          GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            screen -S funddrama -X quit
+            screen -dmS funddrama
+            screen -S funddrama -X stuff "cd /path/to/your/project$(printf \\r)"
+            screen -S funddrama -X stuff "git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/your-repo/your-project.git$(printf \\r)"
+            screen -S funddrama -X stuff "npm install$(printf \\r)"
+            screen -S funddrama -X stuff "npm run build$(printf \\r)"
+            screen -S funddrama -X stuff "npm run start$(printf \\r)"
+          EOF
