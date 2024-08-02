@@ -20,7 +20,7 @@ jobs:
 
       - name: Quit existing screen session
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X quit"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X quit || true"
 
       - name: Start new screen session
         run: |
@@ -28,23 +28,23 @@ jobs:
 
       - name: Change directory
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X stuff 'cd fund-the-drama && printf \\r'"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama"
 
       - name: Git pull latest changes
         env:
           GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X stuff 'git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git && printf \\r'"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama && git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git"
 
       - name: Install dependencies
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X stuff 'npm install && printf \\r'"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama && npm install"
 
       - name: Build project
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X stuff 'npm run build && printf \\r'"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama && npm run build"
 
       - name: Start project
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X stuff 'npm run start && printf \\r'"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X stuff 'cd fund-the-drama && npm run start && printf \\r'"
