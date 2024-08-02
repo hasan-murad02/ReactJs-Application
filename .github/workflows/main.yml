@@ -26,9 +26,5 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             screen -S funddrama -X quit
             screen -dmS funddrama
-            screen -S funddrama -X stuff "cd fund-the-drama$(printf \\r)"
-            screen -S funddrama -X stuff "git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git$(printf \\r)"
-            screen -S funddrama -X stuff "npm install$(printf \\r)"
-            screen -S funddrama -X stuff "npm run build$(printf \\r)"
-            screen -S funddrama -X stuff "npm run start$(printf \\r)"
+            screen -S funddrama -X stuff "cd fund-the-drama && git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git && npm install && npm run build && npm run start$(printf \\r)"
           EOF
