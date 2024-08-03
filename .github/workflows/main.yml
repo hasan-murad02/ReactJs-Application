@@ -48,4 +48,8 @@ jobs:
 
             # Start the project
             screen -S funddrama -X stuff "npm run start && printf \\r"
+            sleep 2
+
+            # Check if the npm run start command was sent
+            screen -ls
           EOF
