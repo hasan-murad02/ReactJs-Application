@@ -18,33 +18,34 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Quit existing screen session
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X quit || true"
-
-      - name: Start new screen session
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -dmS funddrama"
-
-      - name: Change directory
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama"
-
-      - name: Git pull latest changes
+      - name: Deploy to server
         env:
           GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama && git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            # Quit existing screen session if any
+            screen -S funddrama -X quit || true
 
-      - name: Install dependencies
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama && npm install"
+            # Start a new screen session
+            screen -dmS funddrama
 
-      - name: Build project
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd fund-the-drama && npm run build"
+            # Change to the project directory within the screen session
+            screen -S funddrama -X stuff "cd fund-the-drama && printf \\r"
+            sleep 2
 
-      - name: Start project
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "screen -S funddrama -X stuff 'cd fund-the-drama && npm run start && printf \\r'"
+            # Pull latest changes
+            screen -S funddrama -X stuff "git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git && printf \\r"
+            sleep 2
+
+            # Install dependencies
+            screen -S funddrama -X stuff "npm install && printf \\r"
+            sleep 2
+
+            # Build the project
+            screen -S funddrama -X stuff "npm run build && printf \\r"
+            sleep 2
+
+            # Start the project
+            screen -S funddrama -X stuff "npm run start && printf \\r"
+          EOF
