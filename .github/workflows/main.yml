@@ -27,30 +27,29 @@ jobs:
             # Quit existing screen session if any
             screen -S funddrama -X quit || true
 
-            # Start a new screen session with logging enabled
-            screen -dmL -S funddrama
+            # Start a new screen session
+            screen -dmS funddrama
 
             # Change to the project directory within the screen session
-            screen -S funddrama -p 0 -X stuff "cd fund-the-drama && printf \\r"
-            sleep 5
+            screen -S funddrama -X stuff "cd fund-the-drama"
+            sleep 2
 
             # Pull latest changes
-            screen -S funddrama -p 0 -X stuff "git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git && printf \\r"
-            sleep 30
+            screen -S funddrama -X stuff "git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git "
+            sleep 2
 
             # Install dependencies
-            screen -S funddrama -p 0 -X stuff "npm install && printf \\r"
-            sleep 300
+            screen -S funddrama -X stuff "npm install "
+            sleep 2
 
             # Build the project
-            screen -S funddrama -p 0 -X stuff "npm run build && printf \\r"
-            sleep 300
+            screen -S funddrama -X stuff "npm run build "
+            sleep 2
 
             # Start the project
-            screen -S funddrama -p 0 -X stuff "npm run start && printf \\r"
-            sleep 30
+            screen -S funddrama -X stuff "npm run start "
+            sleep 2
 
-            # Print the screen session logs for debugging
-            screen -S funddrama -X hardcopy /tmp/screenlog.txt
-            cat /tmp/screenlog.txt
+            # Check if the npm run start command was sent
+            screen -ls
           EOF
