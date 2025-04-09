@@ -32,20 +32,32 @@ jobs:
         REPO_URL="https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/ReactJs-Application"
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-        cd ~/testing-github-actions
+        # Create DEPLOY_DIR if it doesn't exist
+        if [ ! -d "$DEPLOY_DIR" ]; then
+          echo "Creating deployment directory: $DEPLOY_DIR"
+          mkdir -p $DEPLOY_DIR
+        fi
         
-        echo "Updating existing repository..."
-        git fetch origin
-        git reset --hard origin/main
-        git clean -fd
+        cd $DEPLOY_DIR
         
-        echo "Installing dependencies..."
-
-        cd ReactJs-Application
-
-        npm i
-        npm run build
+        if [ ! -d "ReactJs-Application" ]; then
+          echo "Cloning repository for the first time..."
+          git clone $REPO_URL
+          cd ReactJs-Application
+          npm i
+          npm run build
+        else
+          echo "Updating existing repository..."
+          cd ReactJs-Application
+          git fetch origin
+          git reset --hard origin/main
+          git clean -fd
+          echo "Installing dependencies..."
+          npm i
+          npm run build
+        fi
         
+        # Restart the screen session
         if screen -list | grep -q "$SCREEN_NAME"; then
           screen -S $SCREEN_NAME -X stuff $'\003'
           sleep 3
