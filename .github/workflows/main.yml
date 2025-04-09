@@ -6,8 +6,6 @@ on:
   workflow_dispatch:
 
 env:
-  DEPLOY_DIR: '~/testing-github-actions'  # Change to your path
-  SCREEN_NAME: 'testing-githubActions'  # Your screen session name
   NODE_ENV: 'production'
 
 jobs:
@@ -65,7 +63,7 @@ jobs:
         fi
         
         echo "Starting the server right now....."
-        screen -dmS $SCREEN_NAME npm run start
+        screen -dmS testing-githubActions npm run start
         
-        echo "✅ React app deployed and running in screen session: $SCREEN_NAME"
+        echo "✅ React app deployed and running in screen session: testing-githubActions"
         EOF
