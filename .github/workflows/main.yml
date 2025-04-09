@@ -32,7 +32,7 @@ jobs:
 
         if screen -list | grep -q "${{ secrets.SCREEN_NAME }}"; then 
           echo "Screen session already exists"
-          screen -X -S ${{ secrets.SCREEN_NAME }} quit
+          screen -ls | grep -o '[0-9]\+\.${{ secrets.SCREEN_NAME }}' | awk '{print $1}' | xargs -I {} screen -X -S {} quit
         else
           echo "Creating new screen session"
           screen -dmS ${{ secrets.SCREEN_NAME }}
