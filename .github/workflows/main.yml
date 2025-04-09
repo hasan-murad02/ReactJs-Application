@@ -73,7 +73,7 @@ jobs:
         fi
         
         echo "Starting the server right now....."
-        screen -dmS ${{ secrets.SCREEN_NAME }} npm run start
+        screen -r ${{ secrets.SCREEN_NAME }} npm run start
         
         echo "✅ React app deployed"
         EOF
