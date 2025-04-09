@@ -73,7 +73,7 @@ jobs:
         fi
         
         echo "Starting the server right now....."
-        screen -r ${{ secrets.SCREEN_NAME }} cd ${{ secrets.SCREEN_NAME }} && cd cd ${{ secrets.REPO_FOLDER_NAME }} && npm run start
+        screen -S "${{ secrets.SCREEN_NAME }}" bash -c "cd ${{ secrets.REPO_FOLDER_NAME }} && npm run start"
         
         echo "✅ React app deployed"
         EOF
