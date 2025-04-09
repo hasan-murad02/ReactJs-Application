@@ -56,7 +56,7 @@ jobs:
         fi
         
         # Restart the screen session
-        if screen -list | grep -q "$SCREEN_NAME"; then
+        if screen -list | grep -q "$SCREEN_NAME"; then 
           screen -S $SCREEN_NAME -X stuff $'\003'
           sleep 3
           screen -S $SCREEN_NAME -X quit
