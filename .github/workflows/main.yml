@@ -1,55 +1,60 @@
-name: Deploy
+name: Deploy React App to VM
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DEPLOY_DIR: '/var/www/my-react-app'  # Change to your path
+  SCREEN_NAME: 'testing-githubActions'  # Your screen session name
+  NODE_ENV: 'production'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        # Disable host key checking (not recommended for production)
+        config: |
+          StrictHostKeyChecking no
+          UserKnownHostsFile /dev/null
 
-      - name: Deploy to server
-        env:
-          GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            # Quit existing screen session if any
-            screen -S funddrama -X quit || true
-
-            # Start a new screen session
-            screen -dmS funddrama
-
-            # Change to the project directory within the screen session
-            screen -S funddrama -X stuff "cd fund-the-drama"
-            sleep 2
-
-            # Pull latest changes
-            screen -S funddrama -X stuff "git pull https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/tensorlabs-io/fund-the-drama.git "
-            sleep 2
-
-            # Install dependencies
-            screen -S funddrama -X stuff "npm install "
-            sleep 2
-
-            # Build the project
-            screen -S funddrama -X stuff "npm run build "
-            sleep 2
-
-            # Start the project
-            screen -S funddrama -X stuff "npm run start "
-            sleep 2
-
-            # Check if the npm run start command was sent
-            screen -ls
-          EOF
+    - name: Deploy React App
+      run: |
+        REPO_URL="https://${{ secrets.USER_PAT }}@github.com/${{ github.repository }}.git"
+        
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+        mkdir -p $DEPLOY_DIR || exit 1
+        cd $DEPLOY_DIR
+        
+        if [ -d .git ]; then
+          git reset --hard
+          git clean -fd
+          git pull origin main
+        else
+          git clone $REPO_URL .
+        fi
+        
+        npm ci
+        npm run build
+        
+        if screen -list | grep -q "$SCREEN_NAME"; then
+          screen -S $SCREEN_NAME -X stuff $'\003'
+          sleep 3
+          screen -S $SCREEN_NAME -X quit
+          sleep 1
+        fi
+        
+        cd build
+        screen -dmS $SCREEN_NAME serve -s . -l 3000
+        
+        echo "✅ React app deployed and running in screen session: $SCREEN_NAME"
+        EOF
