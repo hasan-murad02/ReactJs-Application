@@ -46,7 +46,7 @@ jobs:
         
         cd ${{ secrets.SCREEN_NAME }}
         
-        if [ ! -d "${{ secrets.REPO_FOLDER_NAME }}" ]; then 
+        if [ ! -d "${{ secrets.REPO_FOLDER_NAME }}" ]; then
           echo "Cloning repository for the first time..."
           git clone https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/${{ secrets.REPO_FOLDER_NAME }}
           cd ${{ secrets.REPO_FOLDER_NAME }}
@@ -66,14 +66,14 @@ jobs:
         
         # Restart the screen session
         if screen -list | grep -q "${{ secrets.SCREEN_NAME }} "; then
-          screen -d -r ${{ secrets.SCREEN_NAME }}  -X stuff $'\003'
+          screen -S ${{ secrets.SCREEN_NAME }}  -X stuff $'\003'
           sleep 3
-          screen -d -r ${{ secrets.SCREEN_NAME }}  -X quit
+          screen -S ${{ secrets.SCREEN_NAME }}  -X quit
           sleep 1
         fi
         
         echo "Starting the server right now....."
-        screen -d -r ${{ secrets.SCREEN_NAME }} npm run start
+        screen -S ${{ secrets.SCREEN_NAME }} npm run start
         
         echo "✅ React app deployed"
         EOF
