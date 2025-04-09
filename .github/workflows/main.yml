@@ -66,14 +66,14 @@ jobs:
         
         # Restart the screen session
         if screen -list | grep -q "${{ secrets.SCREEN_NAME }} "; then
-          screen -S ${{ secrets.SCREEN_NAME }}  -X stuff $'\003'
+          screen -d -r ${{ secrets.SCREEN_NAME }}  -X stuff $'\003'
           sleep 3
-          screen -S ${{ secrets.SCREEN_NAME }}  -X quit
+          screen -d -r ${{ secrets.SCREEN_NAME }}  -X quit
           sleep 1
         fi
         
         echo "Starting the server right now....."
-        screen -r ${{ secrets.SCREEN_NAME }} npm run start
+        screen -d -r ${{ secrets.SCREEN_NAME }} npm run start
         
         echo "✅ React app deployed"
         EOF
