@@ -34,15 +34,10 @@ jobs:
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
         cd ~/testing-github-actions
         
-        if [ -d .git ]; then
-            echo "Updating existing repository..."
-            git fetch origin
-            git reset --hard origin/main
-            git clean -fd
-        else
-            echo "Cloning new repository..."
-            git clone https://${{ secrets.GITHUB_PAT }}@github.com/${{ github.repository }}.git .
-        fi
+        echo "Updating existing repository..."
+        git fetch origin
+        git reset --hard origin/main
+        git clean -fd
         
         echo "Installing dependencies..."
 
@@ -58,7 +53,7 @@ jobs:
           sleep 1
         fi
         
-        screen -dmS $SCREEN_NAME npm run start
+        npm run start
         
         echo "✅ React app deployed and running in screen session: $SCREEN_NAME"
         EOF
