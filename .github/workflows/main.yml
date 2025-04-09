@@ -29,7 +29,7 @@ jobs:
 
     - name: Deploy React App
       run: |
-        REPO_URL="https://${{ secrets.GITHUB_PAT }}@github.com/${{ github.repository }}.git"
+        REPO_URL="https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/ReactJs-Application"
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
         cd ~/testing-github-actions
@@ -53,7 +53,8 @@ jobs:
           sleep 1
         fi
         
-        npm run start
+        echo "Starting the server right now....."
+        screen -dmS $SCREEN_NAME npm run start
         
         echo "✅ React app deployed and running in screen session: $SCREEN_NAME"
         EOF
