@@ -35,11 +35,13 @@ jobs:
         cd $DEPLOY_DIR
         
         if [ -d .git ]; then
-          git reset --hard
-          git clean -fd
-          git pull origin main
+            echo "Updating existing repository..."
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
         else
-          git clone $REPO_URL .
+            echo "Cloning new repository..."
+            git clone https://${{ secrets.GITHUB_PAT }}@github.com/${{ github.repository }}.git .
         fi
         
         npm i
