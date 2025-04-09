@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  DEPLOY_DIR: '/var/www/my-react-app'  # Change to your path
+  DEPLOY_DIR: '/testing-github-actions'  # Change to your path
   SCREEN_NAME: 'testing-githubActions'  # Your screen session name
   NODE_ENV: 'production'
 
@@ -22,10 +22,6 @@ jobs:
       uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        # Disable host key checking (not recommended for production)
-        config: |
-          StrictHostKeyChecking no
-          UserKnownHostsFile /dev/null
 
     - name: Deploy React App
       run: |
@@ -43,7 +39,7 @@ jobs:
           git clone $REPO_URL .
         fi
         
-        npm ci
+        npm i
         npm run build
         
         if screen -list | grep -q "$SCREEN_NAME"; then
@@ -53,8 +49,7 @@ jobs:
           sleep 1
         fi
         
-        cd build
-        screen -dmS $SCREEN_NAME serve -s . -l 3000
+        screen -dmS $SCREEN_NAME npm run start
         
         echo "✅ React app deployed and running in screen session: $SCREEN_NAME"
         EOF
