@@ -32,7 +32,7 @@ jobs:
         REPO_URL="https://${{ secrets.GITHUB_PAT }}@github.com/${{ github.repository }}.git"
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-        cd $DEPLOY_DIR
+        cd ~/testing-github-actions
         
         if [ -d .git ]; then
             echo "Updating existing repository..."
