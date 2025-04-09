@@ -31,7 +31,7 @@ jobs:
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
         # Create DEPLOY_DIR if it doesn't exist
         if [ ! -d "${{ secrets.SCREEN_NAME }}" ]; then
-          echo "Creating deployment directory: ${{ secrets.SCREEN_NAME }}"
+          echo "Creating deployment directory..."
           mkdir ${{ secrets.SCREEN_NAME }}
         fi
         
@@ -41,6 +41,7 @@ jobs:
           echo "Cloning repository for the first time..."
           git clone https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/${{ secrets.REPO_FOLDER_NAME }}
           cd ${{ secrets.REPO_FOLDER_NAME }}
+          echo "Installing dependencies..."
           npm i
           npm run build
         else
@@ -65,5 +66,5 @@ jobs:
         echo "Starting the server right now....."
         screen -dmS testing-githubActions npm run start
         
-        echo "✅ React app deployed and running in screen session: testing-githubActions"
+        echo "✅ React app deployed"
         EOF
