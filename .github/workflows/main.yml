@@ -46,7 +46,7 @@ jobs:
         
         cd ${{ secrets.SCREEN_NAME }}
         
-        if [ ! -d "${{ secrets.REPO_FOLDER_NAME }}" ]; then
+        if [ ! -d "${{ secrets.REPO_FOLDER_NAME }}" ]; then 
           echo "Cloning repository for the first time..."
           git clone https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/${{ secrets.REPO_FOLDER_NAME }}
           cd ${{ secrets.REPO_FOLDER_NAME }}
