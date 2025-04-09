@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  DEPLOY_DIR: '/testing-github-actions'  # Change to your path
+  DEPLOY_DIR: '~/testing-github-actions'  # Change to your path
   SCREEN_NAME: 'testing-githubActions'  # Your screen session name
   NODE_ENV: 'production'
 
@@ -32,7 +32,6 @@ jobs:
         REPO_URL="https://${{ secrets.GITHUB_PAT }}@github.com/${{ github.repository }}.git"
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-        mkdir -p $DEPLOY_DIR || exit 1
         cd $DEPLOY_DIR
         
         if [ -d .git ]; then
