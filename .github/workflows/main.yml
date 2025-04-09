@@ -29,6 +29,15 @@ jobs:
       run: |
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+
+        if screen -list | grep -q "${{ secrets.SCREEN_NAME }}"; then
+          echo "Screen session already exists"
+          screen -d ${{ secrets.SCREEN_NAME }}
+        else
+          echo "Creating new screen session"
+          screen -dmS ${{ secrets.SCREEN_NAME }}
+        fi
+
         # Create DEPLOY_DIR if it doesn't exist
         if [ ! -d "${{ secrets.SCREEN_NAME }}" ]; then
           echo "Creating deployment directory..."
@@ -56,15 +65,15 @@ jobs:
         fi
         
         # Restart the screen session
-        if screen -list | grep -q "$SCREEN_NAME"; then 
-          screen -S $SCREEN_NAME -X stuff $'\003'
+        if screen -list | grep -q "${{ secrets.SCREEN_NAME }} "; then 
+          screen -S ${{ secrets.SCREEN_NAME }}  -X stuff $'\003'
           sleep 3
-          screen -S $SCREEN_NAME -X quit
+          screen -S ${{ secrets.SCREEN_NAME }}  -X quit
           sleep 1
         fi
         
         echo "Starting the server right now....."
-        screen -dmS testing-githubActions npm run start
+        screen -dmS ${{ secrets.SCREEN_NAME }} npm run start
         
         echo "✅ React app deployed"
         EOF
