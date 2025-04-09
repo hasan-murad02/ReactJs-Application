@@ -30,7 +30,7 @@ jobs:
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
 
-        if screen -list | grep -q "${{ secrets.SCREEN_NAME }}"; then 
+        if screen -list | grep -q "${{ secrets.SCREEN_NAME }}"; then
           echo "Screen session already exists"
           screen -ls | grep -o '[0-9]\+\.${{ secrets.SCREEN_NAME }}' | awk '{print $1}' | xargs -I {} screen -X -S {} quit
         else
