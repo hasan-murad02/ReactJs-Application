@@ -29,20 +29,19 @@ jobs:
 
     - name: Deploy React App
       run: |
-        REPO_URL="https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/ReactJs-Application"
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
         # Create DEPLOY_DIR if it doesn't exist
-        if [ ! -d "$DEPLOY_DIR" ]; then
-          echo "Creating deployment directory: $DEPLOY_DIR"
-          mkdir -p $DEPLOY_DIR
+        if [ ! -d "testing-github-actions" ]; then
+          echo "Creating deployment directory: testing-github-actions"
+          mkdir testing-github-actions
         fi
         
-        cd $DEPLOY_DIR
+        cd testing-github-actions
         
         if [ ! -d "ReactJs-Application" ]; then
           echo "Cloning repository for the first time..."
-          git clone $REPO_URL
+          git clone https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/ReactJs-Application
           cd ReactJs-Application
           npm i
           npm run build
