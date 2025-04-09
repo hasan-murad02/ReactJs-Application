@@ -30,22 +30,22 @@ jobs:
         
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
         # Create DEPLOY_DIR if it doesn't exist
-        if [ ! -d "testing-github-actions" ]; then
-          echo "Creating deployment directory: testing-github-actions"
-          mkdir testing-github-actions
+        if [ ! -d "${{ secrets.SCREEN_NAME }}" ]; then
+          echo "Creating deployment directory: ${{ secrets.SCREEN_NAME }}"
+          mkdir ${{ secrets.SCREEN_NAME }}
         fi
         
-        cd testing-github-actions
+        cd ${{ secrets.SCREEN_NAME }}
         
-        if [ ! -d "ReactJs-Application" ]; then
+        if [ ! -d "${{ secrets.REPO_FOLDER_NAME }}" ]; then
           echo "Cloning repository for the first time..."
-          git clone https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/ReactJs-Application
-          cd ReactJs-Application
+          git clone https://${{ secrets.GITHUB_PAT }}@github.com/hasan-murad02/${{ secrets.REPO_FOLDER_NAME }}
+          cd ${{ secrets.REPO_FOLDER_NAME }}
           npm i
           npm run build
         else
           echo "Updating existing repository..."
-          cd ReactJs-Application
+          cd ${{ secrets.REPO_FOLDER_NAME }}
           git fetch origin
           git reset --hard origin/main
           git clean -fd
